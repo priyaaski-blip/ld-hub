@@ -1,6 +1,6 @@
 // ── CONFIG ──────────────────────────────────────────────────────────────
 // Replace this URL after deploying your Apps Script Web App
-const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/greytip.com/s/AKfycbyTc6lKZ2H1OOqiqXp9imSBeHmWMT2ZYK5cuwifesAQrFtqsnHT4wYrc70vMFUAkM1boQ/exec';
 
 // ── DATA ─────────────────────────────────────────────────────────────────
 const BATCHES = [
