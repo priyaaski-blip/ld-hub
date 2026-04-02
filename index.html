@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>L&D Hub — greytHR</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%233b82f6'/><text y='.9em' font-size='60' x='10'>L</text></svg>"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">L&D</div>
+      <div>
+        <div class="logo-name">L&D Hub</div>
+        <div class="logo-tag">greytHR · Learning</div>
+      </div>
+    </div>
+    <div class="role-bar">
+      <div class="role-dot" id="rdot"></div>
+      <div class="role-label" id="rlabel">Admin (You)</div>
+      <div class="role-switch" onclick="switchRole()">Switch ↺</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-sec">Overview</div>
+      <div class="ni active" onclick="go('dash',this)"><span class="dot" style="background:#3b82f6"></span>Dashboard</div>
+
+      <div class="nav-sec">Batches</div>
+      <div class="ni" onclick="go('batches',this)"><span class="dot" style="background:#8b5cf6"></span>Batch Folders<span class="cnt bb" id="batch-count">4</span></div>
+
+      <div class="nav-sec">Learning</div>
+      <div class="ni" onclick="go('assess',this)"><span class="dot" style="background:#10b981"></span>Self Assessments</div>
+      <div class="ni" onclick="go('assign',this)"><span class="dot" style="background:#f59e0b"></span>Assignments<span class="cnt ba">3</span></div>
+      <div class="ni" onclick="go('materials',this)"><span class="dot" style="background:#14b8a6"></span>Learning Materials</div>
+
+      <div class="nav-sec">Tracking</div>
+      <div class="ni" onclick="go('attend',this)"><span class="dot" style="background:#ef4444"></span>Attendance</div>
+      <div class="ni" onclick="go('feedback',this)"><span class="dot" style="background:#ec4899"></span>Feedback Forms</div>
+
+      <div class="nav-sec">Reports</div>
+      <div class="ni" onclick="go('reports',this)"><span class="dot" style="background:#f97316"></span>Report Folders</div>
+    </nav>
+    <div class="user-footer">
+      <div class="av" id="uav" style="background:#eff6ff;color:#3b82f6">PK</div>
+      <div>
+        <div class="uname" id="uname">Priya K.</div>
+        <div class="urole" id="urole">L&D Admin</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dash">
+      <div class="ph">
+        <div><div class="pt">Good morning, Priya 👋</div><div class="ps">Your L&D Hub — all batches, sessions and assignments at a glance.</div></div>
+        <button class="btn btn-p btn-sm" onclick="go('batches',document.querySelector('[onclick*=batches]'))">+ New Batch</button>
+      </div>
+      <div class="g4">
+        <div class="sc"><div class="sl">Active Batches</div><div class="sv" style="color:#8b5cf6">4</div><div class="sbadge bp">2 in progress</div></div>
+        <div class="sc"><div class="sl">Participants</div><div class="sv" style="color:#3b82f6">58</div><div class="sbadge bb">Across all batches</div></div>
+        <div class="sc"><div class="sl">Pending Assignments</div><div class="sv" style="color:#f59e0b">12</div><div class="sbadge ba">Awaiting submission</div></div>
+        <div class="sc"><div class="sl">Feedback Collected</div><div class="sv" style="color:#10b981">89%</div><div class="sbadge bg">Above target</div></div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="ct">Active Batches <span class="b bb">This Quarter</span></div>
+          <div class="batch-list">
+            <div class="batch-row"><div class="batch-icon" style="background:#f5f3ff">🎯</div><div class="batch-info"><div class="batch-title">Sales Team — Batch A</div><div class="batch-meta">14 participants · Enterprise Sales</div><div class="pb"><div class="pf" style="width:72%;background:#8b5cf6"></div></div></div><span class="b bp">72%</span></div>
+            <div class="batch-row"><div class="batch-icon" style="background:#ecfdf5">🤝</div><div class="batch-info"><div class="batch-title">CS Team — Batch B</div><div class="batch-meta">12 participants · CS Excellence</div><div class="pb"><div class="pf" style="width:55%;background:#10b981"></div></div></div><span class="b bg">55%</span></div>
+            <div class="batch-row"><div class="batch-icon" style="background:#eff6ff">📞</div><div class="batch-info"><div class="batch-title">Support — Batch C</div><div class="batch-meta">18 participants · Comm. Skills</div><div class="pb"><div class="pf" style="width:38%;background:#3b82f6"></div></div></div><span class="b bb">38%</span></div>
+            <div class="batch-row"><div class="batch-icon" style="background:#fff7ed">⚙️</div><div class="batch-info"><div class="batch-title">Implementation — Batch D</div><div class="batch-meta">14 participants · MEDDIC</div><div class="pb"><div class="pf" style="width:90%;background:#f97316"></div></div></div><span class="b bo">90%</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ct">Recent Activity</div>
+          <div class="activity-list">
+            <div class="act-row"><div class="av" style="background:#ecfdf5;color:#10b981;width:28px;height:28px;font-size:10px">RS</div><div><span class="act-name">Ravi S.</span> submitted Assignment 2 <span class="act-batch">· Sales Batch A</span><div class="act-time">2h ago</div></div></div>
+            <div class="act-row"><div class="av" style="background:#f5f3ff;color:#8b5cf6;width:28px;height:28px;font-size:10px">AN</div><div><span class="act-name">Anjali N.</span> completed self-assessment <span class="act-batch">· CS Batch B</span><div class="act-time">4h ago</div></div></div>
+            <div class="act-row"><div class="av" style="background:#fdf2f8;color:#ec4899;width:28px;height:28px;font-size:10px">KP</div><div><span class="act-name">Karan P.</span> downloaded reference guide <span class="act-batch">· Support Batch C</span><div class="act-time">Yesterday</div></div></div>
+            <div class="act-row"><div class="av" style="background:#eff6ff;color:#3b82f6;width:28px;height:28px;font-size:10px">MS</div><div><span class="act-name">Meera S.</span> submitted feedback form <span class="act-batch">· CS Batch B</span><div class="act-time">Yesterday</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BATCH FOLDERS -->
+    <div class="page" id="page-batches">
+      <div class="ph">
+        <div><div class="pt">Batch Folders</div><div class="ps">Each batch has its own space — materials, assignments, assessments and attendance.</div></div>
+        <button class="btn btn-p btn-sm" onclick="toggleCreateBatch()">+ Create Batch</button>
+      </div>
+      <div id="batch-create-form" style="display:none" class="card" style="margin-bottom:20px">
+        <div class="ct">Create New Batch</div>
+        <div class="g2">
+          <div class="fg"><label class="fl">Batch Name</label><input class="fi" id="bn" placeholder="e.g. Sales Batch E — Q2 2026"/></div>
+          <div class="fg"><label class="fl">Department</label><select class="fsel" id="bdept"><option>Sales</option><option>Customer Success</option><option>Support</option><option>Implementation</option><option>Cross-functional</option></select></div>
+        </div>
+        <div class="g2">
+          <div class="fg"><label class="fl">Program / Course</label><input class="fi" id="bprog" placeholder="e.g. Enterprise Sales Mastery"/></div>
+          <div class="fg"><label class="fl">Start Date</label><input class="fi" type="date" id="bstart"/></div>
+        </div>
+        <div class="fg"><label class="fl">Participant Emails (comma-separated)</label><textarea class="fta" id="bemails" placeholder="ravi@greytip.com, anjali@greytip.com, ..."></textarea></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-p btn-sm" onclick="saveBatch()">Create & Save</button>
+          <button class="btn btn-o btn-sm" onclick="toggleCreateBatch()">Cancel</button>
+        </div>
+      </div>
+      <div class="g3" id="batch-grid"></div>
+      <div id="batch-detail" style="display:none"></div>
+    </div>
+
+    <!-- SELF ASSESSMENTS -->
+    <div class="page" id="page-assess">
+      <div class="ph">
+        <div><div class="pt">Self Assessments</div><div class="ps">Batch and department-wise assessment sheets — participants fill and submit here.</div></div>
+        <button class="btn btn-p btn-sm" onclick="toast('New assessment sheet created!')">+ New Assessment</button>
+      </div>
+      <div class="tabs" id="assess-tabs">
+        <div class="tab active" onclick="filterAssess('',this)">All Batches</div>
+        <div class="tab" onclick="filterAssess('Sales',this)">Sales</div>
+        <div class="tab" onclick="filterAssess('CS',this)">Customer Success</div>
+        <div class="tab" onclick="filterAssess('Support',this)">Support</div>
+        <div class="tab" onclick="filterAssess('Impl',this)">Implementation</div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="tbl" id="assess-table">
+          <thead><tr><th>Assessment</th><th>Batch</th><th>Dept</th><th>Questions</th><th>Responses</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="assess-body"></tbody>
+        </table>
+      </div>
+      <!-- Participant fill form -->
+      <div class="card" style="margin-top:20px">
+        <div class="ct">Fill Self Assessment <span class="b bg">Participant View</span></div>
+        <div class="g2">
+          <div class="fg"><label class="fl">Your Name</label><input class="fi" placeholder="Enter your full name"/></div>
+          <div class="fg"><label class="fl">Select Assessment</label>
+            <select class="fsel">
+              <option>Session 3 — Objection Handling (Sales Batch A)</option>
+              <option>Mid-program Check-in (CS Batch B)</option>
+              <option>MEDDIC Final Assessment (Impl. Batch D)</option>
+            </select>
+          </div>
+        </div>
+        <div id="assess-qs-main"></div>
+        <div class="fg" style="margin-top:12px"><label class="fl">Key Learnings</label><textarea class="fta" placeholder="What did you take away from this session?"></textarea></div>
+        <div class="fg"><label class="fl">Areas to Improve</label><textarea class="fta" placeholder="What do you want to work on?"></textarea></div>
+        <button class="btn btn-p" onclick="submitAssessMain()">Submit Assessment</button>
+        <div id="assess-main-msg" style="display:none" class="success-msg">✓ Assessment submitted successfully!</div>
+      </div>
+    </div>
+
+    <!-- ASSIGNMENTS -->
+    <div class="page" id="page-assign">
+      <div class="ph">
+        <div><div class="pt">Assignments</div><div class="ps">Share sheets with participants — they complete and upload back here.</div></div>
+        <label class="btn btn-p btn-sm" style="cursor:pointer">+ Upload Assignment <input type="file" style="display:none" onchange="uploadAssignment(this)"/></label>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="ct">Assignment Tracker <span class="b ba" id="open-count">3 Active</span></div>
+          <div id="assign-tracker"></div>
+        </div>
+        <div class="card">
+          <div class="ct">Submit Your Assignment <span class="b bg">Participant View</span></div>
+          <div class="fg"><label class="fl">Your Name & Batch</label><input class="fi" id="sub-name" placeholder="e.g. Ravi Shankar — Sales Batch A"/></div>
+          <div class="fg"><label class="fl">Select Assignment</label>
+            <select class="fsel" id="sub-asgn">
+              <option>Assignment 2 — Objection Handling (Due Apr 5)</option>
+              <option>Case Study — greytHR Deal Scenario (Due Apr 10)</option>
+            </select>
+          </div>
+          <div class="uz" onclick="document.getElementById('sub-file').click()">
+            <div class="uz-icon">📤</div>
+            <div class="uz-txt">Upload completed assignment</div>
+            <div class="uz-hint">PDF, Word, Excel — Max 10MB</div>
+            <input type="file" id="sub-file" style="display:none" onchange="handleSubFile(this)"/>
+          </div>
+          <div id="sub-file-name" style="display:none;font-size:13px;color:var(--green);margin-top:8px;font-weight:500"></div>
+          <div class="fg" style="margin-top:12px"><label class="fl">Notes for trainer (optional)</label><textarea class="fta" placeholder="Any comments?" style="min-height:60px"></textarea></div>
+          <button class="btn btn-p" onclick="submitParticipantAssign()">Submit Assignment</button>
+          <div id="assign-sub-msg" style="display:none" class="success-msg">✓ Submitted! Your trainer will review it.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEARNING MATERIALS -->
+    <div class="page" id="page-materials">
+      <div class="ph">
+        <div><div class="pt">Learning Materials</div><div class="ps">Upload and share reference guides, slide decks, handouts and recordings.</div></div>
+        <label class="btn btn-p btn-sm" style="cursor:pointer">+ Upload Material <input type="file" multiple style="display:none" onchange="addMaterialMain(this)"/></label>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+        <select class="fsel" style="width:180px"><option value="">All Batches</option><option>Sales Batch A</option><option>CS Batch B</option><option>Support Batch C</option><option>Impl. Batch D</option></select>
+        <select class="fsel" style="width:150px"><option>All Types</option><option>Reference Guide</option><option>Slide Deck</option><option>Handout</option><option>Video</option><option>Template</option></select>
+        <input class="fi" style="width:220px" placeholder="Search materials..."/>
+      </div>
+      <div class="g3" id="materials-grid">
+        <!-- seeded by JS -->
+      </div>
+    </div>
+
+    <!-- ATTENDANCE -->
+    <div class="page" id="page-attend">
+      <div class="ph"><div><div class="pt">Attendance Tracker</div><div class="ps">Mark and save attendance batch-wise for every session.</div></div></div>
+      <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center">
+        <select class="fsel" style="width:230px" id="att-batch-sel" onchange="loadAtt()">
+          <option>Sales Team — Batch A</option>
+          <option>CS Team — Batch B</option>
+          <option>Support — Batch C</option>
+          <option>Implementation — Batch D</option>
+        </select>
+        <select class="fsel" style="width:200px">
+          <option>Session 1 — Apr 1</option>
+          <option>Session 2 — Apr 8</option>
+          <option>Session 3 — Apr 15</option>
+        </select>
+        <input type="date" class="fi" style="width:155px" value="2026-04-01"/>
+        <button class="btn btn-o btn-sm" onclick="markAllPresent()">✓ Mark All Present</button>
+        <button class="btn btn-g btn-sm" onclick="saveAttendance()">Save Attendance</button>
+      </div>
+      <div class="g4" style="margin-bottom:18px">
+        <div class="sc" style="padding:14px 16px"><div class="sl">Total</div><div class="sv" style="font-size:22px" id="att-total">0</div></div>
+        <div class="sc" style="padding:14px 16px"><div class="sl">Present</div><div class="sv" style="font-size:22px;color:#10b981" id="att-pres">0</div></div>
+        <div class="sc" style="padding:14px 16px"><div class="sl">Absent</div><div class="sv" style="font-size:22px;color:#ef4444" id="att-abs">0</div></div>
+        <div class="sc" style="padding:14px 16px"><div class="sl">Attendance %</div><div class="sv" style="font-size:22px;color:#f59e0b" id="att-pct">0%</div></div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="tbl"><thead><tr><th>Participant</th><th>Dept</th><th>Prev Sessions</th><th>Today</th><th>Toggle</th></tr></thead>
+        <tbody id="att-body"></tbody></table>
+      </div>
+    </div>
+
+    <!-- FEEDBACK -->
+    <div class="page" id="page-feedback">
+      <div class="ph">
+        <div><div class="pt">Feedback Forms</div><div class="ps">Collect post-session and end-of-program feedback batch-wise.</div></div>
+        <button class="btn btn-p btn-sm" onclick="copyFeedbackLink()">📋 Copy Form Link</button>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="ct">Submit Feedback <span class="b bg">Participant View</span></div>
+          <div class="fg"><label class="fl">Your Name & Batch</label><input class="fi" placeholder="e.g. Anjali Nair — CS Batch B"/></div>
+          <div class="fg"><label class="fl">Session / Program</label>
+            <select class="fsel">
+              <option>Session 3 — Objection Handling (Sales Batch A)</option>
+              <option>Mid-program Check-in (CS Batch B)</option>
+              <option>Session 2 — Communication (Support Batch C)</option>
+              <option>MEDDIC Final Session (Impl. Batch D)</option>
+            </select>
+          </div>
+          <div class="fg"><label class="fl">Overall Rating</label>
+            <div style="display:flex;gap:4px" id="fb-stars">
+              <span class="star" onclick="setStars(1)">★</span>
+              <span class="star" onclick="setStars(2)">★</span>
+              <span class="star" onclick="setStars(3)">★</span>
+              <span class="star" onclick="setStars(4)">★</span>
+              <span class="star" onclick="setStars(5)">★</span>
+            </div>
+          </div>
+          <div class="fg"><label class="fl">Content Relevance</label>
+            <div style="display:flex;gap:14px;flex-wrap:wrap">
+              <label class="radio-lbl"><input type="radio" name="rel"> Excellent</label>
+              <label class="radio-lbl"><input type="radio" name="rel"> Good</label>
+              <label class="radio-lbl"><input type="radio" name="rel"> Average</label>
+              <label class="radio-lbl"><input type="radio" name="rel"> Poor</label>
+            </div>
+          </div>
+          <div class="fg"><label class="fl">What was most useful?</label><textarea class="fta" placeholder="Share what worked well..."></textarea></div>
+          <div class="fg"><label class="fl">Suggestions for improvement</label><textarea class="fta" placeholder="What could be better?"></textarea></div>
+          <button class="btn btn-p" onclick="submitFeedback()">Submit Feedback</button>
+          <div id="fb-msg" style="display:none" class="success-msg">✓ Thank you! Feedback recorded.</div>
+        </div>
+        <div class="card">
+          <div class="ct">Recent Responses <span class="b bb" id="fb-count">89 total</span></div>
+          <table class="tbl" id="fb-table">
+            <thead><tr><th>Participant</th><th>Batch</th><th>Rating</th><th>Relevance</th></tr></thead>
+            <tbody id="fb-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORT FOLDERS -->
+    <div class="page" id="page-reports">
+      <div class="ph">
+        <div><div class="pt">Report Folders</div><div class="ps">Batch-wise compiled reports — attendance summaries, assessment results and feedback analysis.</div></div>
+        <button class="btn btn-p btn-sm" onclick="toast('Report generated and saved to folder!')">Generate Report</button>
+      </div>
+      <div class="g3" id="reports-grid"></div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
