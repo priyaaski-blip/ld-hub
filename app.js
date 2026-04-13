@@ -8,7 +8,7 @@
 //  ✅ Certificate issuance
 // ════════════════════════════════════════════════════════════════
 
-const API = 'https://script.googleusercontent.com/a/macros/greytip.com/echo?user_content_key=AWDtjMUEYfv0-YCJfmG_tAlFd-LMAdCOw_otus8XjdO3Pc2aQIH81Yl13H1ABTxzFwdK4N_8RbKbQdtkqrjt11TxMWzYTl34nYK4tSovxIv-oFEfIwm-0DCMYG7zuPdnbbzAgzpH62XVF-iWP8ujxgE1W75wVpKGXI7XCGcohmx5I3BKvAdY_KdrgbYRkxRC9Xf4hu-UZqCe10L0k9O_5S7q7qcAQuFXeS3A977W7ajPZ5ESM6lk5tdGZGvdah3KOzdqndU7C0TMvYllrIyqo_FxrDXEp9udFclEe-Ei47ktFRMzaz2n_1E&lib=MegbckXIXlXbWo6FHJLYjBSnJ-3BPHXIn/exec';
+const API = 'https://script.google.com/a/macros/greytip.com/s/AKfycbyq2lZlkBn52KC5doSBCOQF2AHiOH_DCziwsO_1XK1jCpowdSb4TrsDFPMF2H5QbOBbiQ/exec';
 
 // ── ASSESS QUESTIONS (fixed, not from Sheet) ──────────────────────
 const ASSESS_QUESTIONS = [
