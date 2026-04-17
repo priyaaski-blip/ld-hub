@@ -223,9 +223,12 @@ function go(id, el) {
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
   if(el) el.classList.add('active');
   
-  document.querySelectorAll('.page').forEach(p => p.style.display='none');
+  // Hide all pages by removing 'active' class
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  
+  // Show the selected page by adding 'active' class
   const page = document.getElementById('page-' + id);
-  if(page) page.style.display='block';
+  if(page) page.classList.add('active');
   
   toast(id.charAt(0).toUpperCase() + id.slice(1) + ' loaded', 'info');
 }
