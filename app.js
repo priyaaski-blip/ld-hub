@@ -1,16 +1,10 @@
-// ════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════���═════════════════════
 //  L&D Hub — greytHR  |  app.js  |  v4.0
-//  ✅ Loads ALL data from Google Sheets on startup
-//  ✅ Real file uploads to Google Drive (base64)
-//  ✅ greytRISE skill assessment integration
-//  ✅ Auto-progress calculation from real data
-//  ✅ Email notifications via Apps Script
-//  ✅ Certificate issuance
 // ════════════════════════════════════════════════════════════════
 
 const API = 'https://script.google.com/a/macros/greytip.com/s/AKfycbw30On6y9c37Qu4I3HfwzDIhGLbAWoaXzUYajjWR4WRjxEz2Yce4mPcH-sa4APdS2WydA/exec';
 
-// ── APP STATE ────────────────────────────────────────────────────
+// ── APP STATE ───────────────────────��────────────────────────────
 let STATE = {
   users:       {},
   batches:     [],
@@ -21,7 +15,10 @@ let STATE = {
 let currentUser = null;
 
 // ── INIT ──────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', showLogin);
+document.addEventListener('DOMContentLoaded', () => {
+  // Check if user is logged in, otherwise show login
+  showLogin();
+});
 
 // ── HELPERS ───────────────────────────────────────────────────────
 const isAdmin = () => currentUser?.role === 'admin';
@@ -33,7 +30,7 @@ function toast(msg, type='info') {
   if(!t){t=document.createElement('div');t.id='toast';t.className='toast';document.body.appendChild(t);}
   t.textContent=msg;
   t.style.background=type==='success'?'#059669':type==='error'?'#dc2626':'#1c1e2e';
-  t.style.cssText+='position:fixed;bottom:20px;right:20px;padding:12px 18px;border-radius:8px;color:#fff;font-size:13px;z-index:9999;animation:slideIn .3s;';
+  t.style.cssText='position:fixed;bottom:20px;right:20px;padding:12px 18px;border-radius:8px;color:#fff;font-size:13px;z-index:9999;';
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),3000);
 }
@@ -48,13 +45,14 @@ async function apiGet(params) {
 }
 
 // ════════════════════════════════════════════════════════════════
-//  LOGIN + STARTUP DATA LOAD
+//  LOGIN
 // ════════════════════════════════════════════════════════════════
 function showLogin() {
   document.body.innerHTML=`
   <style>
     @keyframes spin{to{transform:rotate(360deg)}}
     @keyframes slideIn{from{transform:translateX(400px);opacity:0}to{transform:translateX(0);opacity:1}}
+    body { margin: 0; font-family: 'DM Sans', sans-serif; }
   </style>
   <link rel="stylesheet" href="styles.css"/>
   <div style="min-height:100vh;background:#f5f6fa;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif">
@@ -67,11 +65,11 @@ function showLogin() {
       <div style="font-size:13px;color:#6b7280;margin-bottom:22px">Enter your greytHR email to continue</div>
       <label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Email address</label>
       <input id="login-email" type="email" placeholder="yourname@greytip.com"
-        style="width:100%;padding:10px 13px;border:1px solid #e4e6ef;border-radius:8px;font-size:14px;outline:none;margin-bottom:10px;font-family:'DM Sans',sans-serif;transition:border .15s"
+        style="width:100%;padding:10px 13px;border:1px solid #e4e6ef;border-radius:8px;font-size:14px;outline:none;margin-bottom:10px;font-family:'DM Sans',sans-serif;box-sizing:border-box"
         onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#e4e6ef'"
         onkeydown="if(event.key==='Enter')doLogin()"/>
       <div id="login-err" style="display:none;font-size:12px;color:#ef4444;margin-bottom:10px;padding:8px 12px;background:#fef2f2;border-radius:6px"></div>
-      <button id="login-btn" onclick="doLogin()" style="width:100%;padding:11px;background:#3b82f6;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s">Continue →</button>
+      <button id="login-btn" onclick="doLogin()" style="width:100%;padding:11px;background:#3b82f6;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;box-sizing:border-box">Continue →</button>
       <div style="margin-top:16px;background:#f9fafb;border-radius:8px;padding:14px;font-size:12px">
         <div style="font-weight:500;color:#374151;margin-bottom:8px">Demo logins — click to fill:</div>
         <div style="display:flex;flex-direction:column;gap:5px">
@@ -100,10 +98,9 @@ async function doLogin() {
     init = await Promise.race([apiGet({ action:'init' }), timeoutPromise]);
   } catch(e) {
     console.warn('API failed or timed out:', e.message);
-    init = null; // Will trigger fallback to demo users
+    init = null;
   }
 
-  // Merge Sheet users with any hardcoded fallback
   STATE.users = (init?.users) || {};
 
   // Fallback users if Sheet is empty
@@ -122,21 +119,18 @@ async function doLogin() {
   const user = STATE.users[email];
   if(!user){ 
     document.getElementById('login-err').style.display='block';
-    document.getElementById('login-err').textContent='Email not found. Please check or contact priya@greytip.com';
+    document.getElementById('login-err').textContent='Email not found. Try: priya@greytip.com';
     btn.textContent='Continue →'; 
     btn.disabled=false; 
     return; 
   }
 
   currentUser = { ...user, email };
+  STATE.batches = (init?.batches || []);
+  STATE.assignments = init?.assignments || [];
+  STATE.materials = init?.materials || [];
+  STATE.assessments = init?.assessments || [];
 
-  // Load state from Sheets data (or use empty arrays if API failed)
-  STATE.batches     = (init?.batches || []);
-  STATE.assignments = init?.assignments  || [];
-  STATE.materials   = init?.materials    || [];
-  STATE.assessments = init?.assessments  || [];
-
-  // If no batches, use demo data
   if(STATE.batches.length === 0) {
     STATE.batches = [
       {id:'A',name:'Sales Team — Batch A',    dept:'Sales',           program:'Enterprise Sales Mastery',participants:14,progress:72,status:'In Progress'},
@@ -152,89 +146,71 @@ async function doLogin() {
 function loadApp() {
   const rc = isAdmin()?'#3b82f6':isMgr()?'#f59e0b':'#10b981';
   const rl = isAdmin()?'L&D Admin':isMgr()?'Team Manager':'Participant';
+  const ini = currentUser.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   
-  document.body.innerHTML=`
+  // Just update the sidebar
+  document.body.innerHTML = `
   <link rel="stylesheet" href="styles.css"/>
   <div class="app">
     <div class="sidebar">
       <div class="logo"><div class="logo-icon">L&D</div><div><div class="logo-name">L&D Hub</div><div class="logo-tag">greytHR · Learning</div></div></div>
       <div class="role-bar">
-        <div class="role-dot" style="background:${rc}"></div>
-        <div class="role-label">${rl}</div>
+        <div class="role-dot" id="rdot" style="background:${rc}"></div>
+        <div class="role-label" id="rlabel">${rl}</div>
         <div class="role-switch" onclick="doLogout()">Logout</div>
       </div>
       <nav class="nav">
         <div class="nav-sec">Menu</div>
         <div class="ni active" onclick="go('dash',this)"><span class="dot" style="background:#3b82f6"></span>Dashboard</div>
+        <div class="nav-sec">Learning</div>
         <div class="ni" onclick="go('batches',this)"><span class="dot" style="background:#8b5cf6"></span>Batch Folders</div>
+        <div class="ni" onclick="go('assess',this)"><span class="dot" style="background:#10b981"></span>Self Assessments</div>
         <div class="ni" onclick="go('assign',this)"><span class="dot" style="background:#f59e0b"></span>Assignments</div>
-        <div class="ni" onclick="go('materials',this)"><span class="dot" style="background:#14b8a6"></span>Learning Materials</div>
+        <div class="ni" onclick="go('materials',this)"><span class="dot" style="background:#14b8a6"></span>Materials</div>
+        <div class="nav-sec">Tracking</div>
+        <div class="ni" onclick="go('attend',this)"><span class="dot" style="background:#ef4444"></span>Attendance</div>
+        <div class="ni" onclick="go('feedback',this)"><span class="dot" style="background:#ec4899"></span>Feedback</div>
+        <div class="nav-sec">Reports</div>
+        <div class="ni" onclick="go('reports',this)"><span class="dot" style="background:#f97316"></span>Reports</div>
       </nav>
       <div class="user-footer">
-        <div class="av" style="background:#eff6ff;color:${rc}">${currentUser.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div>
-        <div><div class="uname">${currentUser.name}</div><div class="urole">${currentUser.dept}</div></div>
+        <div class="av" id="uav" style="background:#eff6ff;color:${rc}">${ini}</div>
+        <div><div class="uname" id="uname">${currentUser.name}</div><div class="urole" id="urole">${currentUser.dept}</div></div>
       </div>
     </div>
-    <main class="main" id="main-content"></main>
-  </div>
-  <div class="toast" id="toast"></div>`;
-  
-  go('dash', document.querySelector('.ni'));
-}
-
-function go(id, el) {
-  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
-  if(el) el.classList.add('active');
-  const main=document.getElementById('main-content');
-  if(!main) return;
-  
-  if(id === 'dash') {
-    main.innerHTML = `
-      <div style="padding:30px">
-        <div style="font-size:24px;font-weight:600;margin-bottom:6px">Welcome, ${currentUser.name.split(' ')[0]}! 👋</div>
-        <div style="font-size:14px;color:#6b7280;margin-bottom:30px">Your L&D Hub is ready</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
-          ${STATE.batches.map(b=>`
-            <div style="background:#fff;border:1px solid #e4e6ef;border-radius:12px;padding:20px;cursor:pointer" onclick="go('batches',document.querySelector('[onclick*=batches]'))">
-              <div style="font-size:28px;margin-bottom:8px">🎯</div>
-              <div style="font-size:14px;font-weight:500">${b.name}</div>
-              <div style="font-size:12px;color:#6b7280;margin-top:8px">${b.participants} participants</div>
-              <div style="width:100%;height:6px;background:#f0f0f0;border-radius:3px;margin-top:10px">
-                <div style="width:${b.progress}%;height:100%;background:#3b82f6;border-radius:3px"></div>
-              </div>
-            </div>
-          `).join('')}
+    <main class="main" id="main">
+      <div id="page-dash" class="page active">
+        <div style="padding:30px">
+          <h1 style="font-size:28px;margin:0 0 12px 0">Welcome, ${currentUser.name.split(' ')[0]}! 👋</h1>
+          <p style="color:#6b7280;margin:0 0 30px 0">Your L&D Hub is ready</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
+            ${STATE.batches.map((b,i)=>`<div style="background:#fff;border:1px solid #e4e6ef;border-radius:12px;padding:20px;cursor:pointer" onclick="go('batches',document.querySelectorAll('.ni')[${i+2}])"><div style="font-size:28px;margin-bottom:8px">🎯</div><div style="font-size:14px;font-weight:500">${b.name}</div><div style="font-size:12px;color:#6b7280;margin-top:8px">${b.participants} participants • ${b.progress}%</div></div>`).join('')}
+          </div>
         </div>
       </div>
-    `;
-  } else if(id === 'batches') {
-    main.innerHTML = `
-      <div style="padding:30px">
-        <div style="font-size:24px;font-weight:600;margin-bottom:20px">Batch Folders</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px">
-          ${STATE.batches.map(b=>`
-            <div style="background:#fff;border:1px solid #e4e6ef;border-radius:12px;padding:20px">
-              <div style="font-size:28px;margin-bottom:12px">🗂️</div>
-              <div style="font-size:16px;font-weight:600;margin-bottom:4px">${b.name}</div>
-              <div style="font-size:13px;color:#6b7280">${b.dept} • ${b.program}</div>
-              <div style="margin-top:12px;padding-top:12px;border-top:1px solid #f0f0f0">
-                <div style="font-size:12px;color:#6b7280">📊 ${b.participants} participants</div>
-                <div style="font-size:12px;color:#6b7280;margin-top:4px">✓ ${b.progress}% complete</div>
-              </div>
-            </div>
-          `).join('')}
+      <div id="page-batches" class="page">
+        <div style="padding:30px">
+          <h2 style="margin:0 0 20px 0">Batch Folders</h2>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px">
+            ${STATE.batches.map(b=>`<div style="background:#fff;border:1px solid #e4e6ef;border-radius:12px;padding:20px"><div style="font-size:28px;margin-bottom:12px">🗂️</div><div style="font-size:16px;font-weight:600">${b.name}</div><div style="font-size:13px;color:#6b7280">${b.dept} • ${b.program}</div><div style="margin-top:12px;padding-top:12px;border-top:1px solid #f0f0f0"><div style="font-size:12px;color:#6b7280">📊 ${b.participants} participants</div></div></div>`).join('')}
+          </div>
         </div>
       </div>
-    `;
-  } else if(id === 'assign') {
-    main.innerHTML = `<div style="padding:30px"><div style="font-size:24px;font-weight:600">Assignments</div><p style="color:#6b7280">Upload and manage assignments here.</p></div>`;
-  } else if(id === 'materials') {
-    main.innerHTML = `<div style="padding:30px"><div style="font-size:24px;font-weight:600">Learning Materials</div><p style="color:#6b7280">Share educational resources with participants.</p></div>`;
-  }
-}
-
-function doLogout() { 
-  currentUser=null; 
-  STATE={users:{},batches:[],assignments:[],materials:[],assessments:[]}; 
-  showLogin(); 
-}
+      <div id="page-assess" class="page">
+        <div style="padding:30px"><h2>Self Assessments</h2><p style="color:#6b7280">Manage self-assessment forms for your batches.</p></div>
+      </div>
+      <div id="page-assign" class="page">
+        <div style="padding:30px"><h2>Assignments</h2><p style="color:#6b7280">Upload and manage assignments here.</p></div>
+      </div>
+      <div id="page-materials" class="page">
+        <div style="padding:30px"><h2>Learning Materials</h2><p style="color:#6b7280">Share educational resources with participants.</p></div>
+      </div>
+      <div id="page-attend" class="page">
+        <div style="padding:30px"><h2>Attendance</h2><p style="color:#6b7280">Mark and track attendance for your batches.</p></div>
+      </div>
+      <div id="page-feedback" class="page">
+        <div style="padding:30px"><h2>Feedback</h2><p style="color:#6b7280">Collect feedback from your participants.</p></div>
+      </div>
+      <div id="page-reports" class="page">
+        <div style="padding
+
