@@ -212,5 +212,26 @@ function loadApp() {
         <div style="padding:30px"><h2>Feedback</h2><p style="color:#6b7280">Collect feedback from your participants.</p></div>
       </div>
       <div id="page-reports" class="page">
-        <div style="padding
-
+        <div style="padding:30px"><h2>Reports</h2><p style="color:#6b7280">View compiled reports for your batches.</p></div>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>`;
+}
+
+function go(id, el) {
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  
+  document.querySelectorAll('.page').forEach(p => p.style.display='none');
+  const page = document.getElementById('page-' + id);
+  if(page) page.style.display='block';
+  
+  toast(id.charAt(0).toUpperCase() + id.slice(1) + ' loaded', 'info');
+}
+
+function doLogout() { 
+  currentUser=null; 
+  STATE={users:{},batches:[],assignments:[],materials:[],assessments:[]}; 
+  showLogin(); 
+}
