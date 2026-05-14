@@ -973,8 +973,58 @@ async function dlFeedbackCSV(){
 // ════════════════════════════════════════════════════════════════
 //  greytRISE SKILL ASSESSMENT (NEW PAGE)
 // ════════════════════════════════════════════════════════════════
+let greytRISEAutoRefreshTimer = null;
+
 async function renderGreytRISE(el){
-  el.innerHTML=`<div class="ph"><div><div class="pt">Skill Assessment — greytRISE</div><div class="ps">Live skill gap data from your greytRISE master sheet — 12 competencies across all teams.</div></div><button class="btn btn-p btn-sm" onclick="loadGreytRISE()">↻ Load from greytRISE</button></div><div id="gr-content"><div style="font-size:13px;color:var(--muted);padding:20px">Click "Load from greytRISE" to fetch the latest skill gap data.</div></div>`;
+  if (greytRISEAutoRefreshTimer) clearInterval(greytRISEAutoRefreshTimer);
+  el.innerHTML=`<div class="ph"><div><div class="pt">Skill Assessment — greytRISE</div><div class="ps">Dynamic manager scoring, competency heatmap, and AI-based course suggestions from leading learning platforms.</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-o btn-sm" onclick="toggleGreytRISEAutoRefresh(this)">⏱ Auto-refresh: ON</button><button class="btn btn-p btn-sm" onclick="loadGreytRISE()">↻ Load from greytRISE</button></div></div><div id="gr-content"><div style="font-size:13px;color:var(--muted);padding:20px">Loading latest skill insights...</div></div>`;
+  loadGreytRISE();
+  greytRISEAutoRefreshTimer = setInterval(loadGreytRISE, 120000);
+}
+
+function toggleGreytRISEAutoRefresh(btn){
+  if(greytRISEAutoRefreshTimer){
+    clearInterval(greytRISEAutoRefreshTimer);
+    greytRISEAutoRefreshTimer = null;
+    btn.textContent='⏱ Auto-refresh: OFF';
+    toast('Auto-refresh paused');
+  } else {
+    greytRISEAutoRefreshTimer = setInterval(loadGreytRISE, 120000);
+    btn.textContent='⏱ Auto-refresh: ON';
+    toast('Auto-refresh resumed','success');
+    loadGreytRISE();
+  }
+}
+
+function scoreColor(score){
+  if(score>=4) return '#10b981';
+  if(score>=3) return '#3b82f6';
+  return '#ef4444';
+}
+
+function heatClass(score){
+  if(score>=4.2) return 'h5';
+  if(score>=3.6) return 'h4';
+  if(score>=3) return 'h3';
+  if(score>=2.2) return 'h2';
+  return 'h1';
+}
+
+function aiCourseSuggestions(gaps=[]){
+  const lib={
+    communication:['Coursera: Improving Communication Skills','LinkedIn Learning: Communicating with Confidence'],
+    objection:['Udemy: Sales Objection Handling Masterclass','LinkedIn Learning: Overcoming Objections in Sales'],
+    listening:['Coursera: Active Listening for Professionals','Skillshare: Better Listening at Work'],
+    discovery:['Udemy: Consultative Discovery and Questioning','Coursera: Customer Discovery Techniques'],
+    empathy:['LinkedIn Learning: Building Customer Empathy','Coursera: Empathy and Emotional Intelligence'],
+    pipeline:['Coursera: Sales Operations & Pipeline Management','Udemy: CRM and Pipeline Analytics']
+  };
+  const mapped=[];
+  gaps.forEach(g=>{
+    const key=Object.keys(lib).find(k=>g.toLowerCase().includes(k));
+    if(key) mapped.push(...lib[key]);
+  });
+  return [...new Set(mapped)].slice(0,6);
 }
 
 async function loadGreytRISE(){
@@ -991,6 +1041,9 @@ async function loadGreytRISE(){
   const gaps=data.gaps||[];
   const all=data.allEmployees||[];
   const competencies=data.competencies||[];
+  const scopeRows = isPart() ? all.filter(a => a.email===currentUser.email) : (isMgr() ? all.filter(a => currentUser.batchIds.includes(a.batchId||a.BatchID||'')) : all);
+  const heatmapRows = (scopeRows.length ? scopeRows : all).slice(0,12);
+  const managerEditable = !isPart();
 
   el.innerHTML=`
     ${emp?`<div class="card" style="margin-bottom:20px">
@@ -999,34 +1052,41 @@ async function loadGreytRISE(){
         ${(emp.scores||[]).map(s=>`<div style="background:var(--faint);border-radius:var(--rs);padding:10px 12px">
           <div style="font-size:11px;color:var(--muted);margin-bottom:4px">${s.name}</div>
           <div style="display:flex;align-items:center;gap:8px">
-            <div class="pb" style="flex:1"><div class="pf" style="width:${(s.score||0)/5*100}%;background:${s.score>=4?'#10b981':s.score>=3?'#3b82f6':'#ef4444'}"></div></div>
-            <span style="font-size:13px;font-weight:500;color:${s.score>=4?'#10b981':s.score>=3?'#3b82f6':'#ef4444'}">${s.score||0}/5</span>
+            <div class="pb" style="flex:1"><div class="pf" style="width:${(s.score||0)/5*100}%;background:${scoreColor(s.score||0)}"></div></div>
+            <span style="font-size:13px;font-weight:500;color:${scoreColor(s.score||0)}">${s.score||0}/5</span>
           </div>
         </div>`).join('')}
       </div>
-      ${gaps.length?`
-      <div style="background:#fef2f2;border-radius:var(--rs);padding:12px;margin-bottom:12px">
-        <div style="font-size:13px;font-weight:500;color:#991b1b;margin-bottom:6px">Identified Skill Gaps</div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px">${gaps.map(g=>`<span class="b bc">${g}</span>`).join('')}</div>
-      </div>
+      ${gaps.length?`<div style="background:#fef2f2;border-radius:var(--rs);padding:12px;margin-bottom:12px"><div style="font-size:13px;font-weight:500;color:#991b1b;margin-bottom:6px">Identified Skill Gaps</div><div style="display:flex;flex-wrap:wrap;gap:6px">${gaps.map(g=>`<span class="b bc">${g}</span>`).join('')}</div></div>`:''}
       <div style="background:#eff6ff;border-radius:var(--rs);padding:12px">
-        <div style="font-size:13px;font-weight:500;color:#1e40af;margin-bottom:6px">Recommended Training</div>
-        <div style="font-size:12px;color:#1e40af">${myBatches().filter(b=>gaps.some(g=>b.program.toLowerCase().includes(g.toLowerCase().split(' ')[0]))).map(b=>`<div>• ${b.name} — ${b.program}</div>`).join('')||'Contact your L&D Admin for a personalised recommendation.'}</div>
-      </div>`:''}
+        <div style="font-size:13px;font-weight:500;color:#1e40af;margin-bottom:6px">AI Suggested Courses (Coursera · LinkedIn Learning · Udemy)</div>
+        <div style="font-size:12px;color:#1e40af">${aiCourseSuggestions(gaps).map(c=>`<div>• ${c}</div>`).join('')||'No urgent upskilling needs right now. Keep progressing on your current learning path.'}</div>
+      </div>
     </div>`:''}
+
+    <div class="card" style="margin-bottom:20px">
+      <div class="ct">Team Competency Heatmap <span class="b bb">Live view</span></div>
+      <div style="overflow:auto">
+      <table class="tbl"><thead><tr><th>Employee</th>${competencies.slice(0,8).map(c=>`<th style="font-size:10px">${c.slice(0,12)}</th>`).join('')}</tr></thead>
+      <tbody>${heatmapRows.map(r=>`<tr><td style="font-weight:500">${r.name||r.email||''}</td>${competencies.slice(0,8).map(c=>{const v=parseFloat(r[c])||0;return `<td><span class="heat ${heatClass(v)}">${v||'—'}</span></td>`}).join('')}</tr>`).join('')}</tbody></table>
+      </div>
+    </div>
+
     ${(!isPart()&&all.length)?`<div class="card">
       <div class="ct">${isAdmin()?'All Employees — Skill Gaps':'Your Team — Skill Gaps'} <span class="b bb">${all.length} employees</span></div>
-      <table class="tbl"><thead><tr><th>Employee</th>${competencies.slice(0,6).map(c=>`<th style="font-size:10px">${c.slice(0,12)}</th>`).join('')}<th>Status</th></tr></thead>
+      <table class="tbl"><thead><tr><th>Employee</th>${competencies.slice(0,6).map(c=>`<th style="font-size:10px">${c.slice(0,12)}</th>`).join('')}<th>Manager score</th><th>Status</th></tr></thead>
       <tbody>${all.slice(0,20).map(emp=>{
         const scores=competencies.slice(0,6).map(c=>parseFloat(emp[c])||0);
+        const avg=scores.length?(scores.reduce((a,b)=>a+b,0)/scores.length):0;
         const hasGap=scores.some(s=>s<3);
         return`<tr>
           <td style="font-weight:500">${emp.name||emp.email||''}</td>
-          ${scores.map(s=>`<td><span style="font-weight:500;color:${s>=4?'#10b981':s>=3?'#3b82f6':'#ef4444'}">${s||'—'}</span></td>`).join('')}
-          <td><span class="pill ${hasGap?'ba':'bg'}">${hasGap?'Has gaps':'On track'}</span></td>
+          ${scores.map(s=>`<td><span style="font-weight:500;color:${scoreColor(s)}">${s||'—'}</span></td>`).join('')}
+          <td>${managerEditable?`<input class="fi" type="number" min="1" max="5" step="0.1" value="${avg?avg.toFixed(1):''}" style="max-width:72px;padding:6px 8px"/>`:`${avg.toFixed(1)}`}</td>
+          <td><span class="pill ${hasGap?'ba':'bg'}">${hasGap?'Needs action':'On track'}</span></td>
         </tr>`;
       }).join('')}</tbody></table>
-      <button class="btn btn-g btn-sm" style="margin-top:12px" onclick="dlGreytRISECSV()">⬇ Download Gap Report CSV</button>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn btn-g btn-sm" onclick="dlGreytRISECSV()">⬇ Download Gap Report CSV</button><button class="btn btn-p btn-sm" onclick="toast('Manager scores captured. Sync to Sheet endpoint can be wired in Apps Script.','success')">💾 Save Manager Scores</button></div>
     </div>`:''}`;
 }
 

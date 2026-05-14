@@ -191,3 +191,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   .g4,.g3,.g2{grid-template-columns:1fr}
   .main{padding:16px}
 }
+
+/* greytRISE heatmap */
+.heat{display:inline-flex;align-items:center;justify-content:center;min-width:36px;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.heat.h1{background:#fee2e2;color:#991b1b}
+.heat.h2{background:#ffedd5;color:#9a3412}
+.heat.h3{background:#dbeafe;color:#1d4ed8}
+.heat.h4{background:#dcfce7;color:#166534}
+.heat.h5{background:#bbf7d0;color:#14532d}
